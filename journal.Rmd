@@ -69,10 +69,13 @@ Analyze the sales by location (state) with a bar plot. Since state and city are 
 **Load Libraries** 
 
 ```{r}.
+
 library(tidyverse)
 library(readxl)
 install.packages("writexl")
-setwd("D:/Mechatronics_master/Third semester/Data science/DS_101/DS_101")```
+setwd("D:/Mechatronics_master/Third semester/Data science/DS_101/DS_101")
+
+```
 
 **Importing Files**
 
