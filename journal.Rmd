@@ -1,6 +1,6 @@
 ---
 title: "Journal (reproducible report)"
-author: "Ahmed Shahee"
+author: "Ahmed Shaheen"
 date: "2020-11-05"
 output:
   html_document:
