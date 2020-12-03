@@ -422,34 +422,14 @@ div.tocify {
 </div>
 
 
-<p><strong>IMPORTANT:</strong> You can delete everything in here and start fresh. You might want to start by not deleting anything above this line until you know what that stuff is doing.</p>
-<p>This is an <code>.Rmd</code> file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a # in front of your text, it will create a top level-header.</p>
-<div id="my-first-post" class="section level1">
-<h1><span class="header-section-number">1</span> My first post</h1>
-<p>Last compiled: 2020-12-03</p>
-<p>Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left.</p>
-<div id="second-level-header" class="section level2">
-<h2><span class="header-section-number">1.1</span> Second level header</h2>
-<p>You can add more headers by adding more hashtags. These won’t be put into the table of contents</p>
-<div id="third-level-header" class="section level3">
-<h3><span class="header-section-number">1.1.1</span> third level header</h3>
-<p>Here’s an even lower level header</p>
-</div>
-</div>
-</div>
-<div id="my-second-post-note-the-order" class="section level1">
-<h1><span class="header-section-number">2</span> My second post (note the order)</h1>
-<p>Last compiled: 2020-12-03</p>
-<p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
-</div>
 <div id="session_2-challenge" class="section level1">
-<h1><span class="header-section-number">3</span> Session_2 challenge:</h1>
+<h1><span class="header-section-number">1</span> Session_2 challenge:</h1>
 <div id="task-description-sales-analysis" class="section level2">
-<h2><span class="header-section-number">3.1</span> Task description: <strong>SALES ANALYSIS :</strong></h2>
+<h2><span class="header-section-number">1.1</span> Task description: <strong>SALES ANALYSIS :</strong></h2>
 <p>Analyze the sales by location (state) with a bar plot. Since state and city are multiple features (variables), they should be split. Which state has the highes revenue? Replace your bike_orderlines_wrangled_tbl object with the newly wrangled object (with the columns state and city).</p>
 </div>
 <div id="solution" class="section level2">
-<h2><span class="header-section-number">3.2</span> Solution:</h2>
+<h2><span class="header-section-number">1.2</span> Solution:</h2>
 <p><strong>Load Libraries</strong></p>
 <pre class="r"><code>library(tidyverse)
 library(readxl)</code></pre>
@@ -771,16 +751,16 @@ bike_orderlines_wrangled_city_separated_tbl %&gt;%
 </div>
 </div>
 <div id="challenge-3-web-scrapping" class="section level1">
-<h1><span class="header-section-number">4</span> Challenge 3 Web scrapping</h1>
+<h1><span class="header-section-number">2</span> Challenge 3 Web scrapping</h1>
 <div id="task-description" class="section level2">
-<h2><span class="header-section-number">4.1</span> Task description</h2>
+<h2><span class="header-section-number">2.1</span> Task description</h2>
 <ol style="list-style-type: decimal">
 <li><p>Get some data via an API. There are millions of providers, that offer API access for free and have good documentation about how to query their service. You just have to google them. You can use whatever service you want. For example, you can get data about your listening history (spotify), get data about flights (skyscanner) or just check the weather forecast.</p></li>
 <li><p>Scrape one of the competitor websites of canyon (either <a href="https://www.rosebikes.de/" class="uri">https://www.rosebikes.de/</a> or <a href="https://www.radon-bikes.de" class="uri">https://www.radon-bikes.de</a>) and create a small database. The database should contain the model names and prices for at least one category. Use the selectorgadget to get a good understanding of the website structure.</p></li>
 </ol>
 </div>
 <div id="solution-1" class="section level2">
-<h2><span class="header-section-number">4.2</span> Solution</h2>
+<h2><span class="header-section-number">2.2</span> Solution</h2>
 <p>#Session3_ Challenge:</p>
 <p>Notes: # 200: The request has succeeded. # 403: The client does not have access rights to the content. # 404: Not found. The server can not find the requested resource.</p>
 <p><strong>1.0 LIBRARIES</strong></p>
@@ -6625,9 +6605,9 @@ fitness
 </div>
 </div>
 <div id="session-4-challenge-data-wrangling" class="section level1">
-<h1><span class="header-section-number">5</span> Session 4 challenge: Data wrangling</h1>
+<h1><span class="header-section-number">3</span> Session 4 challenge: Data wrangling</h1>
 <div id="task-description-1" class="section level2">
-<h2><span class="header-section-number">5.1</span> Task description:</h2>
+<h2><span class="header-section-number">3.1</span> Task description:</h2>
 <ol style="list-style-type: decimal">
 <li><p>Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.</p></li>
 <li><p>Recent patent acitivity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.</p></li>
@@ -6635,7 +6615,7 @@ fitness
 </ol>
 </div>
 <div id="solution-2" class="section level2">
-<h2><span class="header-section-number">5.2</span> Solution:</h2>
+<h2><span class="header-section-number">3.2</span> Solution:</h2>
 <p><strong>Patents analysis</strong> # Importing data:</p>
 <pre class="r"><code>library(vroom)
 # Tidyverse
