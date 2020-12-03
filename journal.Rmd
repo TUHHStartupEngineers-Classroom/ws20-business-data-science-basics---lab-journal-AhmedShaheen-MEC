@@ -14,6 +14,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
+library(knitr)
 ```
 
 **IMPORTANT:** You can delete everything in here and start fresh. You might want to start by not deleting anything above this line until you know what that stuff is doing.
@@ -47,158 +48,168 @@ So far this is just a blog where you can write in plain text and serve your writ
 So, let's say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:
 
 ```{r}
+
 samples <- rnorm(100, mean=0, sd=1)
 hist(samples)
+
 ```
 
 When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You'll learn that all of these things and more can be customized in each R code block.
 
 # Session_2 challenge:
 
-## Task description: 
+## Task description: **SALES ANALYSIS :**
 
 Analyze the sales by location (state) with a bar plot. Since state and city are multiple features (variables), they should be split. Which state has the highes revenue? Replace your bike_orderlines_wrangled_tbl object with the newly wrangled object (with the columns state and city).
 
 ## Solution:
 
-### Code: 
-
-
-**SALES ANALYSIS :**
-
 **Load Libraries** 
 
-```{r}.
+```{r}
 
 library(tidyverse)
 library(readxl)
-install.packages("writexl")
-setwd("D:/Mechatronics_master/Third semester/Data science/DS_101/DS_101")
 
 ```
 
 **Importing Files**
 
+```{r}
 
-bikes_tbl      <- read_excel(path = "00_data/01_bike_sales/01_raw_data/bikes.xlsx")
+bikes_tbl      <- read_excel("00_data/01_bike_sales/01_raw_data/bikes.xlsx")
 orderlines_tbl <- read_excel("00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
 bikeshops_tbl  <- read_excel("00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
 
+```
 
 **Joining Data**
 
+```{r}
+
 left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
 
+```
+
+
 Chaining commands with the pipe and assigning it to order_items_joined_tbl
+
+```{r}
 
 bike_orderlines_joined_tbl <- orderlines_tbl %>%
   left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%
   left_join(bikeshops_tbl, by = c("customer.id" = "bikeshop.id"))
 
-Re-format:
+bike_orderlines_joined_tbl
+```
+
+**Re-format:**
+
+```{r }
 
 bike_orderlines_joined_tbl %>% glimpse()
+```
 
 **Wrangling Data**
+
+```{r}
 
 bike_orderlines_joined_tbl %>% 
   select(category) %>%
   filter(str_detect(category, "^Mountain")) %>% 
   unique()
 
+bike_orderlines_joined_tbl
+
 bike_orderlines_wrangled_city_separated_tbl <- bike_orderlines_joined_tbl %>%
   
-  Separate category name
+  #Separate category name
   
   separate(col    = category,
            into   = c("category.1", "category.2", "category.3"),
            sep    = " - ") %>% 
   
-  Separate city and state 
+  #Separate city and state 
   
   separate(col    = location,
            into   = c("City", "State"),
            sep    = ", ") %>% 
   
   
-  Add the total price (price * quantity)  
+  #Add the total price (price * quantity)  
 
   mutate(total.price = price * quantity)%>%
   
- Reorganize (remove unwanted columns)
+  #Reorganize (remove unwanted columns)
   select(-...1, -gender)%>%
   
-  Organize by pattern
+  #Organize by pattern
   select(-ends_with(".id"))%>% 
   
-  Re-add order.id column
+  #Re-add order.id column
   
   bind_cols(bike_orderlines_joined_tbl %>% select(order.id)) %>%
   
-  Re-order:
+  #Re-order:
   
   select(order.id, contains("order"), contains("model"), contains("category"),
          price, quantity, total.price,
          everything()) %>%
   
-  Rename columns (one at the time vs. multiple at once)
+  #Rename columns (one at the time vs. multiple at once)
   
   rename(bikeshop = name) %>%
   set_names(names(.) %>% str_replace_all("\\.", "_"))
 
-  
-  
+bike_orderlines_wrangled_city_separated_tbl
+```
 
+  
 **Business Insights**
 
-Analyze the sales by location (state)
+```{r}
+
+#Analyze the sales by location (state) ----
 
 library(lubridate)
-
-Step 1 - Manipulate
-
-sales_by_location_tbl <- bike_orderlines_wrangled_city_separated_tbl %>%
+  # Step 1 - Manipulate
+  sales_by_location_tbl <- bike_orderlines_wrangled_city_separated_tbl %>%
   
-  Select columns
-  
+  # Select columns
   select(State, City, total_price) %>%
   
-  Grouping by state and summarizing sales
-  
+  # Grouping by state and summarizing sales
   group_by(State) %>% 
   summarize(state_sales = sum(total_price)) %>%
   
-  Optional: Add a column that turns the numbers into a currency format 
-  (makes it in the plot optically more appealing)
-  
+  # Optional: Add a column that turns the numbers into a currency format 
+  # (makes it in the plot optically more appealing)
+  # mutate(sales_text = scales::dollar(sales)) <- Works for dollar values
   mutate(sales_formatted = scales::dollar(state_sales, big.mark = ".", 
                                      decimal.mark = ",", 
                                      prefix = "", 
                                      suffix = " €"))
 
-
-**Step 2 - Visualize**
-
-
+sales_by_location_tbl
+# Step 2 - Visualize
 sales_by_location_tbl %>%
+  
+  # Setup canvas with the columns year (x-axis) and sales (y-axis)
   ggplot(aes(x = State, y = state_sales)) +
   
-  Geometries
-  
+  # Geometries
   geom_col(fill = "#2DC6D6") + # Use geom_col for a bar plot
   geom_label(aes(label = sales_formatted)) + # Adding labels to the bars
   geom_smooth(method = "lm", se = FALSE) + # Adding a trendline
   
-  Formatting
-  scale_y_continuous(labels = scales::dollar) + # Change the y-axis. 
-  Again, we have to adjust it for euro values
-  
+  # Formatting
+  # scale_y_continuous(labels = scales::dollar) + # Change the y-axis. 
+  # Again, we have to adjust it for euro values
   scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
                                                     decimal.mark = ",", 
                                                     prefix = "", 
                                                     suffix = " €")) +
-  Rotate plot: 
-  
+  # Rotate plot: 
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
 
   labs(
@@ -207,40 +218,76 @@ sales_by_location_tbl %>%
     y = "Revenue"
   )
 
-**Analyze the sales by location and year*
+#**Step 2 - Visualize**
 
-Step 1 - Manipulate
 
+  sales_by_location_tbl %>%
+  ggplot(aes(x = State, y = state_sales)) +
+  
+  #Geometries
+  
+  geom_col(fill = "#2DC6D6") + # Use geom_col for a bar plot
+  geom_label(aes(label = sales_formatted)) + # Adding labels to the bars
+  geom_smooth(method = "lm", se = FALSE) + # Adding a trendline
+  
+  #Formatting
+  scale_y_continuous(labels = scales::dollar) + # Change the y-axis. 
+  #Again, we have to adjust it for euro values
+  
+  scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
+                                                    decimal.mark = ",", 
+                                                    prefix = "", 
+                                                    suffix = " €")) +
+  #Rotate plot: 
+  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+
+  labs(
+    title    = "States revenue by year",
+    x = "", # Override defaults for x and y
+    y = "Revenue"
+  )
+```
+
+**Analyze the sales by location and year**
+
+```{r}
+
+#Step 1 - Manipulate
 sales_by_state_year_tbl <- bike_orderlines_wrangled_city_separated_tbl %>%
   
-  Select columns and add a year
-  
+  # Select columns and add a year
   select(order_date, total_price, State) %>%
   mutate(year = year(order_date)) %>%
   
-  Group by and summarize year and main catgegory
-  
+  # Group by and summarize year and main catgegory
   group_by(State, year) %>%
   summarise(sales = sum(total_price)) %>%
   ungroup() %>%
   
-  Format $ Text
-  
-  
+  # Format $ Text
   mutate(sales_formatted = scales::dollar(sales, big.mark = ".", 
                                      decimal.mark = ",", 
                                      prefix = "", 
                                      suffix = " €"))
+```
 
 
-**Step 2 - Visualize**
+```{r plot, fig.width=10, fig.height=7}
 
+# Step 2 - Visualize
 sales_by_state_year_tbl %>%
   
-
+  # Set up x, y, fill
   ggplot(aes(x = year, y = sales, fill = State)) +
+  
+  # Geometries
   geom_col() + # Run up to here to get a stacked bar plot
+  
+  # Facet
   facet_wrap(~ State) +
+  
+  # Formatting
   scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
                                                     decimal.mark = ",", 
                                                     prefix = "", 
@@ -251,22 +298,396 @@ sales_by_state_year_tbl %>%
     fill = "States" # Changes the legend name
   )
 
+```
+
 **Writing Files**
 
-Excel:
+```{r}
+
+#Excel:
 
 library("writexl")
 
 bike_orderlines_wrangled_city_separated_tbl %>%
   write_xlsx("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx")
 
-CSV:
+#CSV:
 
 bike_orderlines_wrangled_city_separated_tbl %>% 
   write_csv("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv")
 
-RDS:
+#RDS:
 
 bike_orderlines_wrangled_city_separated_tbl %>% 
   write_rds("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds")
+
+```
+
+
+# Challenge 3 Web scrapping 
+
+## Task description
+
+1. Get some data via an API. There are millions of providers, that offer API access for free and have good documentation about how to query their service. You just have to google them. You can use whatever service you want. For example, you can get data about your listening history (spotify), get data about flights (skyscanner) or just check the weather forecast.
+
+2. Scrape one of the competitor websites of canyon (either https://www.rosebikes.de/ or https://www.radon-bikes.de) and create a small database. The database should contain the model names and prices for at least one category. Use the selectorgadget to get a good understanding of the website structure.
+
+## Solution
+
+\#Session3_ Challenge:
+
+
+
+Notes:
+ \# 200: The request has succeeded.
+ \# 403: The client does not have access rights to the content.
+ \# 404: Not found. The server can not find the requested resource.
+
+
+**1.0 LIBRARIES**
+```{r}
+library(tidyverse) # Main Package - Loads dplyr, purrr, etc.
+library(rvest)     # HTML Hacking & Web Scraping
+library(xopen)     # Quickly opening URLs
+library(jsonlite)  # converts JSON files to R objects
+library(glue)      # concatenate strings
+library(stringi)   # character string/text processing
+library(RSQLite)
+library(httr)
+library("rstudioapi")
+``` 
+
+**Read wibsite API**
+
+```{r}
+  url = "https://itunes.apple.com/search?term=radiohead"
+  
+  resp <- GET(url)
+##########################
+#From a character vector, we can convert it into list data structure using
+#the fromJSON() function from the jsonlite library. We can use toJSON() to
+#convert something back to the original JSON structure.
+##########################
+
+respone_tbl <- resp %>% .$content %>% rawToChar() %>% fromJSON() %>% as_tibble()
+
+kable(respone_tbl)
+```
+
+**WEBSCRAPING**
+
+
+\# 1.0 COLLECT PRODUCT FAMILIES ----
+
+```{r}
+url_home          <- "https://www.rosebikes.de"
+```
+
+\# Read in the HTML for the entire webpage
+```{r}
+html_home         <- read_html(url_home)
+```
+
+\# Web scrape the ids for the families
+```{r}
+bike_family_tbl <- html_home %>%
+  
+  # Get the nodes for the families ...
+  html_nodes(css = ".main-navigation-category-with-tiles__item > a") %>%
+  # ...and extract the information of the id attribute
+  html_attr('href') %>% 
+  
+  # Remove the product families Gear and Outlet and Woman 
+  # (because the female bikes are also listed with the others)
+  discard(.p = ~stringr::str_detect(.x,"sale|reise|urban|kinder|cyclocross|e-bike")) %>%
+  
+  # Convert vector to tibble
+  enframe( name = "", value = "subdirectory") %>%
+  select(-"") %>%
+  
+  # Add the domain, because we will get only the subdirectories
+  mutate(
+    url = glue("https://www.rosebikes.de{subdirectory}")
+  ) %>%
+  separate(col    = subdirectory,
+           into   = c("S","MI", "category_name"),
+           sep    = "/")%>%
+
+  select(-"S",-"MI")
+
+kable(bike_family_tbl)
+
+```
+
+\# 2.0 COLLECT BIKE DATA
+
+\# 2.2 Wrap it into a function
+
+```{r}
+get_bike_data <- function(url, category) {
+
+  html_bike<- read_html(url)
+  
+  bikes <- html_bike %>% html_nodes(css = ".catalog-category-bikes__title-text")%>% 
+           html_text() %>% 
+           enframe(name = "No.", value = "Bike Name")
+  
+  bike_url  <- bikes%>%
+               mutate (
+              
+                Price = html_bike %>% 
+                html_nodes(css = ".catalog-category-bikes__price-title")%>% 
+                html_text()
+              )
+    
+  for (type in bikes) {
+       bike_url <- bike_url %>% mutate(
+       category_name = category
+        )
+  }
+  return (bike_url)
+}
+```
+\# Extract the urls as a character vector
+```{r}
+
+```
+
+```{r}
+
+bike_category_url_vec <- bike_family_tbl %>% pull(url)
+bike_category_cag_vec <- bike_family_tbl %>% pull(category_name)
+
+bike_data_1 =  get_bike_data(bike_category_url_vec[1],bike_category_cag_vec[1])
+bike_data_2 =  get_bike_data(bike_category_url_vec[2],bike_category_cag_vec[2])
+bike_data_3 =  get_bike_data(bike_category_url_vec[3],bike_category_cag_vec[3])
+bike_data_4 =  get_bike_data(bike_category_url_vec[4],bike_category_cag_vec[4])
+
+# Merge the list into a tibble
+bike_data_tbl <- bind_rows(bike_data_1,bike_data_2,bike_data_3, bike_data_4)
+saveRDS(bike_data_tbl, "bike_data_tbl.rds")
+
+kable(bike_data_tbl)
+```
+
+# Session 4 challenge: Data wrangling
+
+## Task description:
+
+1. Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.
+
+2. Recent patent acitivity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.
+
+3. Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?
+
+## Solution:
+
+**Patents analysis** 
+\# Importing data: 
+```{r}
+library(vroom)
+# Tidyverse
+library(tidyverse)
+
+# Data Table
+library(data.table)
+
+# Counter
+library(tictoc)
+```
+
+**Patents DATA IMPORT**
+
+```{r}
+# Patents data preparation:
+
+col_types <- list(
+  id = col_character(),
+  date = col_date("%Y-%m-%d"),
+  num_claims = col_double()
+)
+
+patent_tbl <- vroom(
+  file       = "patent.tsv", 
+  delim      = "\t", 
+  col_types  = col_types,
+  na         = c("", "NA", "NULL")
+)
+
+# Assignee data preparation:
+
+col_types_assignee <- list(
+  id = col_character(),
+  type = col_character(),
+  organization = col_character()
+)
+
+assignee_tbl <- vroom(
+  file       = "assignee.tsv", 
+  delim      = "\t", 
+  col_types  = col_types_assignee,
+  na         = c("", "NA", "NULL")
+)
+
+
+# Patent-Assignee data preparation:
+
+col_types_patent_assignee <- list(
+  patent_id = col_character(),
+  assignee_id = col_character()
+)
+
+
+patent_assignee_tbl <- vroom(
+  file       = "patent_assignee.tsv", 
+  delim      = "\t", 
+  col_types  = col_types_patent_assignee,
+  na         = c("", "NA", "NULL")
+)
+
+col_types_uspc <- list(
+  patent_id = col_character(),
+  mainclass_id = col_number(),
+  sequence = col_number()
+)
+
+# USPC data preparation:
+
+uspc_tbl <- vroom(
+  file       = "uspc.tsv", 
+  delim      = "\t", 
+  col_types  = col_types_uspc,
+  na         = c("", "NA", "NULL")
+)
+```
+
+**Acquisition Data**
+
+```{r}
+setDT(assignee_tbl)
+setDT(patent_tbl)
+setDT(patent_assignee_tbl)
+setDT(uspc_tbl)
+
+patent_tbl %>% glimpse()
+assignee_tbl %>% glimpse()
+patent_assignee_tbl %>% glimpse()
+uspc_tbl %>% glimpse()
+
+```
+
+**DATA WRANGLING**
+
+\# Start the analysis:
+
+**Task1**
+
+```{r}
+#########################################################################
+# Q1.Patent Dominance: What US company / corporation has the most patents? 
+# List the 10 US companies with the most assigned/granted patents.
+## Output: 
+#########################################################################
+
+#summarize and count:
+
+setnames(assignee_tbl, "id", "assignee_id")
+
+combined_data <- merge(x = patent_assignee_tbl, y = assignee_tbl, by = "assignee_id")
+
+
+us_patents <- combined_data %>%
+  filter(type == 2)%>%
+  filter(!is.na(patent_id) || !is.na(organization)) %>%
+  select(-type, -assignee_id)%>% 
+  group_by(organization) %>%
+  count(patent_id) %>%
+  select(-patent_id)%>%
+  summarise(total = sum(n))%>%
+  arrange(desc(total))   
+
+us_top_10 <- us_patents %>% slice(1:10)
+
+kable(us_top_10)
+```
+
+**Task2**
+```{r}
+#########################################################################
+# Q2. Recent patent acitivity: What US company had the most patents granted in 2014? 
+#List the top 10 companies with the most new granted patents for 2019.
+#########################################################################
+
+
+tbl_2 <- patent_tbl %>%   
+         separate(col  = date,
+         into = c("year", "month", "day"),
+          sep  = "-", remove = TRUE) %>%
+          mutate(
+              month = as.numeric(month)
+            )%>%
+          filter(month == 01)%>%
+          select(-year, -day)
+
+setnames(tbl_2, "id", "patent_id")
+combined_data_2 <- merge(x = tbl_2, y = combined_data, by = "patent_id")
+
+us_top10_2014_01 <- combined_data_2%>%
+                    filter(type == 2)%>%
+                    filter(!is.na(patent_id) || !is.na(organization)) %>%
+                    select(organization, patent_id) %>%
+                    group_by(organization) %>%
+                    count(patent_id) %>%   
+                    summarise(total_patents = sum(n))%>%
+                    arrange(desc(total_patents)) %>% slice(1:10)  
+
+us_top10_2014_01_new <- combined_data_2%>%
+                        filter(type == 2 & num_claims == 1)%>%
+                        filter(!is.na(patent_id) || !is.na(organization)) %>%
+                        select(organization, patent_id) %>%
+                        group_by(organization) %>%
+                        count(patent_id) %>%   
+                        summarise(total_patents = sum(n))%>%
+                        arrange(desc(total_patents)) %>% slice(1:10)
+
+kable(us_top10_2014_01, caption = "US to 10 compnies with granted patents")
+kable(us_top10_2014_01_new, caption =  "US top 10 compnies with New granted patents")
+```
+
+
+**Task3**
+```{r}
+ #########################################################################
+# Q. Innovation in Tech: What is the most innovative tech sector? 
+# What is the most innovative tech sector? For the top 10 companies (worldwide)
+# with the most patents, what are the top 5 USPTO tech main classes?
+#########################################################################
+
+combined_data_3 <- merge(x = uspc_tbl, y = combined_data_2, by = "patent_id")
+
+
+
+top10_worlwide_patents <- combined_data_3  %>%
+                  filter(!is.na(patent_id) || !is.na(organization))%>%
+                  group_by(organization) %>%
+                  arrange(desc(mainclass_id)) %>% # set mainclass order first, the result will be sorted automatically 
+                  count(patent_id) %>%
+                  select(-patent_id)%>%
+                  summarise(total_patents_wordwide = sum(n))%>%
+                  ungroup() %>%
+                  arrange(desc(total_patents_wordwide)) %>% slice(1:10)  
+
+top10_worlwid_top5_upts <- top10_worlwide_patents %>% slice(1:5)  
+
+kable(top10_worlwide_patents, caption = "Top 10 granted patents compnies WORLD WIDE")
+kable(top10_worlwid_top5_upts, caption = "Top 5 compnies acquiring UPTS among the TOP 10")
+```
+
+
+
+
+
+
+
+
 

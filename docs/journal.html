@@ -453,82 +453,1277 @@ hist(samples)</code></pre>
 </div>
 <div id="session_2-challenge" class="section level1">
 <h1><span class="header-section-number">4</span> Session_2 challenge:</h1>
-<div id="task-description" class="section level2">
-<h2><span class="header-section-number">4.1</span> Task description:</h2>
+<div id="task-description-sales-analysis" class="section level2">
+<h2><span class="header-section-number">4.1</span> Task description: <strong>SALES ANALYSIS :</strong></h2>
 <p>Analyze the sales by location (state) with a bar plot. Since state and city are multiple features (variables), they should be split. Which state has the highes revenue? Replace your bike_orderlines_wrangled_tbl object with the newly wrangled object (with the columns state and city).</p>
 </div>
 <div id="solution" class="section level2">
 <h2><span class="header-section-number">4.2</span> Solution:</h2>
-<div id="code" class="section level3">
-<h3><span class="header-section-number">4.2.1</span> Code:</h3>
-<p><strong>SALES ANALYSIS :</strong></p>
 <p><strong>Load Libraries</strong></p>
-<p><code>{r}. library(tidyverse) library(readxl) install.packages("writexl") setwd("D:/Mechatronics_master/Third semester/Data science/DS_101/DS_101")</code></p>
+<pre class="r"><code>library(tidyverse)
+library(readxl)</code></pre>
 <p><strong>Importing Files</strong></p>
-<p>bikes_tbl &lt;- read_excel(path = “00_data/01_bike_sales/01_raw_data/bikes.xlsx”) orderlines_tbl &lt;- read_excel(“00_data/01_bike_sales/01_raw_data/orderlines.xlsx”) bikeshops_tbl &lt;- read_excel(“00_data/01_bike_sales/01_raw_data/bikeshops.xlsx”)</p>
+<pre class="r"><code>bikes_tbl      &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
+orderlines_tbl &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
+bikeshops_tbl  &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)</code></pre>
 <p><strong>Joining Data</strong></p>
-<p>left_join(orderlines_tbl, bikes_tbl, by = c(“product.id” = “bike.id”))</p>
+<pre class="r"><code>left_join(orderlines_tbl, bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;))</code></pre>
+<pre><code>## # A tibble: 15,644 x 15
+##    ...1  order.id order.line order.date          customer.id product.id quantity
+##    &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+##  1 1            1          1 2015-01-07 00:00:00           2       2681        1
+##  2 2            1          2 2015-01-07 00:00:00           2       2411        1
+##  3 3            2          1 2015-01-10 00:00:00          10       2629        1
+##  4 4            2          2 2015-01-10 00:00:00          10       2137        1
+##  5 5            3          1 2015-01-10 00:00:00           6       2367        1
+##  6 6            3          2 2015-01-10 00:00:00           6       1973        1
+##  7 7            3          3 2015-01-10 00:00:00           6       2422        1
+##  8 8            3          4 2015-01-10 00:00:00           6       2655        1
+##  9 9            3          5 2015-01-10 00:00:00           6       2247        1
+## 10 10           4          1 2015-01-11 00:00:00          22       2408        1
+## # ... with 15,634 more rows, and 8 more variables: model &lt;chr&gt;,
+## #   model.year &lt;dbl&gt;, frame.material &lt;chr&gt;, weight &lt;dbl&gt;, price &lt;dbl&gt;,
+## #   category &lt;chr&gt;, gender &lt;chr&gt;, url &lt;chr&gt;</code></pre>
 <p>Chaining commands with the pipe and assigning it to order_items_joined_tbl</p>
-<p>bike_orderlines_joined_tbl &lt;- orderlines_tbl %&gt;% left_join(bikes_tbl, by = c(“product.id” = “bike.id”)) %&gt;% left_join(bikeshops_tbl, by = c(“customer.id” = “bikeshop.id”))</p>
-<p>Re-format:</p>
-<p>bike_orderlines_joined_tbl %&gt;% glimpse()</p>
+<pre class="r"><code>bike_orderlines_joined_tbl &lt;- orderlines_tbl %&gt;%
+  left_join(bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;)) %&gt;%
+  left_join(bikeshops_tbl, by = c(&quot;customer.id&quot; = &quot;bikeshop.id&quot;))
+
+bike_orderlines_joined_tbl</code></pre>
+<pre><code>## # A tibble: 15,644 x 19
+##    ...1  order.id order.line order.date          customer.id product.id quantity
+##    &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+##  1 1            1          1 2015-01-07 00:00:00           2       2681        1
+##  2 2            1          2 2015-01-07 00:00:00           2       2411        1
+##  3 3            2          1 2015-01-10 00:00:00          10       2629        1
+##  4 4            2          2 2015-01-10 00:00:00          10       2137        1
+##  5 5            3          1 2015-01-10 00:00:00           6       2367        1
+##  6 6            3          2 2015-01-10 00:00:00           6       1973        1
+##  7 7            3          3 2015-01-10 00:00:00           6       2422        1
+##  8 8            3          4 2015-01-10 00:00:00           6       2655        1
+##  9 9            3          5 2015-01-10 00:00:00           6       2247        1
+## 10 10           4          1 2015-01-11 00:00:00          22       2408        1
+## # ... with 15,634 more rows, and 12 more variables: model &lt;chr&gt;,
+## #   model.year &lt;dbl&gt;, frame.material &lt;chr&gt;, weight &lt;dbl&gt;, price &lt;dbl&gt;,
+## #   category &lt;chr&gt;, gender &lt;chr&gt;, url &lt;chr&gt;, name &lt;chr&gt;, location &lt;chr&gt;,
+## #   lat &lt;dbl&gt;, lng &lt;dbl&gt;</code></pre>
+<p><strong>Re-format:</strong></p>
+<pre class="r"><code>bike_orderlines_joined_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 15,644
+## Columns: 19
+## $ ...1           &lt;chr&gt; &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;...
+## $ order.id       &lt;dbl&gt; 1, 1, 2, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6...
+## $ order.line     &lt;dbl&gt; 1, 2, 1, 2, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 1, 2, 3, 4...
+## $ order.date     &lt;dttm&gt; 2015-01-07, 2015-01-07, 2015-01-10, 2015-01-10, 201...
+## $ customer.id    &lt;dbl&gt; 2, 2, 10, 10, 6, 6, 6, 6, 6, 22, 8, 8, 8, 8, 16, 16,...
+## $ product.id     &lt;dbl&gt; 2681, 2411, 2629, 2137, 2367, 1973, 2422, 2655, 2247...
+## $ quantity       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1...
+## $ model          &lt;chr&gt; &quot;Spectral CF 7 WMN&quot;, &quot;Ultimate CF SLX Disc 8.0 ETAP&quot;...
+## $ model.year     &lt;dbl&gt; 2021, 2020, 2021, 2019, 2020, 2020, 2020, 2021, 2020...
+## $ frame.material &lt;chr&gt; &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;aluminium&quot;,...
+## $ weight         &lt;dbl&gt; 13.80, 7.44, 14.06, 8.80, 11.50, 8.80, 8.20, 8.85, 1...
+## $ price          &lt;dbl&gt; 3119, 5359, 2729, 1749, 1219, 1359, 2529, 1559, 3899...
+## $ category       &lt;chr&gt; &quot;Mountain - Trail - Spectral&quot;, &quot;Road - Race - Ultima...
+## $ gender         &lt;chr&gt; &quot;female&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;u...
+## $ url            &lt;chr&gt; &quot;https://www.canyon.com/en-de/mountain-bikes/trail-b...
+## $ name           &lt;chr&gt; &quot;AlexandeRad&quot;, &quot;AlexandeRad&quot;, &quot;WITT-RAD&quot;, &quot;WITT-RAD&quot;...
+## $ location       &lt;chr&gt; &quot;Hamburg, Hamburg&quot;, &quot;Hamburg, Hamburg&quot;, &quot;Bremen, Bre...
+## $ lat            &lt;dbl&gt; 53.57532, 53.57532, 53.07379, 53.07379, 48.78234, 48...
+## $ lng            &lt;dbl&gt; 10.015340, 10.015340, 8.826754, 8.826754, 9.180819, ...</code></pre>
 <p><strong>Wrangling Data</strong></p>
-<p>bike_orderlines_joined_tbl %&gt;% select(category) %&gt;% filter(str_detect(category, “^Mountain”)) %&gt;% unique()</p>
-<p>bike_orderlines_wrangled_city_separated_tbl &lt;- bike_orderlines_joined_tbl %&gt;%</p>
-<p>Separate category name</p>
-<p>separate(col = category, into = c(“category.1”, “category.2”, “category.3”), sep = " - ") %&gt;%</p>
-<p>Separate city and state</p>
-<p>separate(col = location, into = c(“City”, “State”), sep = “,”) %&gt;%</p>
-<p>Add the total price (price * quantity)</p>
-<p>mutate(total.price = price * quantity)%&gt;%</p>
-<p>Reorganize (remove unwanted columns) select(-…1, -gender)%&gt;%</p>
-<p>Organize by pattern select(-ends_with(“.id”))%&gt;%</p>
-<p>Re-add order.id column</p>
-<p>bind_cols(bike_orderlines_joined_tbl %&gt;% select(order.id)) %&gt;%</p>
-<p>Re-order:</p>
-<p>select(order.id, contains(“order”), contains(“model”), contains(“category”), price, quantity, total.price, everything()) %&gt;%</p>
-<p>Rename columns (one at the time vs. multiple at once)</p>
-<p>rename(bikeshop = name) %&gt;% set_names(names(.) %&gt;% str_replace_all(“\.”, "_"))</p>
+<pre class="r"><code>bike_orderlines_joined_tbl %&gt;% 
+  select(category) %&gt;%
+  filter(str_detect(category, &quot;^Mountain&quot;)) %&gt;% 
+  unique()</code></pre>
+<pre><code>## # A tibble: 10 x 1
+##    category                         
+##    &lt;chr&gt;                            
+##  1 Mountain - Trail - Spectral      
+##  2 Mountain - Trail - Neuron        
+##  3 Mountain - Dirt Jump - Stitched  
+##  4 Mountain - Enduro - Torque       
+##  5 Mountain - Trail - Grand Canyon  
+##  6 Mountain - Cross-Country - Lux   
+##  7 Mountain - Enduro - Strive       
+##  8 Mountain - Downhill - Sender     
+##  9 Mountain - Fat Bikes - Dude      
+## 10 Mountain - Cross-Country - Exceed</code></pre>
+<pre class="r"><code>bike_orderlines_joined_tbl</code></pre>
+<pre><code>## # A tibble: 15,644 x 19
+##    ...1  order.id order.line order.date          customer.id product.id quantity
+##    &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+##  1 1            1          1 2015-01-07 00:00:00           2       2681        1
+##  2 2            1          2 2015-01-07 00:00:00           2       2411        1
+##  3 3            2          1 2015-01-10 00:00:00          10       2629        1
+##  4 4            2          2 2015-01-10 00:00:00          10       2137        1
+##  5 5            3          1 2015-01-10 00:00:00           6       2367        1
+##  6 6            3          2 2015-01-10 00:00:00           6       1973        1
+##  7 7            3          3 2015-01-10 00:00:00           6       2422        1
+##  8 8            3          4 2015-01-10 00:00:00           6       2655        1
+##  9 9            3          5 2015-01-10 00:00:00           6       2247        1
+## 10 10           4          1 2015-01-11 00:00:00          22       2408        1
+## # ... with 15,634 more rows, and 12 more variables: model &lt;chr&gt;,
+## #   model.year &lt;dbl&gt;, frame.material &lt;chr&gt;, weight &lt;dbl&gt;, price &lt;dbl&gt;,
+## #   category &lt;chr&gt;, gender &lt;chr&gt;, url &lt;chr&gt;, name &lt;chr&gt;, location &lt;chr&gt;,
+## #   lat &lt;dbl&gt;, lng &lt;dbl&gt;</code></pre>
+<pre class="r"><code>bike_orderlines_wrangled_city_separated_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
+  
+  #Separate category name
+  
+  separate(col    = category,
+           into   = c(&quot;category.1&quot;, &quot;category.2&quot;, &quot;category.3&quot;),
+           sep    = &quot; - &quot;) %&gt;% 
+  
+  #Separate city and state 
+  
+  separate(col    = location,
+           into   = c(&quot;City&quot;, &quot;State&quot;),
+           sep    = &quot;, &quot;) %&gt;% 
+  
+  
+  #Add the total price (price * quantity)  
+
+  mutate(total.price = price * quantity)%&gt;%
+  
+  #Reorganize (remove unwanted columns)
+  select(-...1, -gender)%&gt;%
+  
+  #Organize by pattern
+  select(-ends_with(&quot;.id&quot;))%&gt;% 
+  
+  #Re-add order.id column
+  
+  bind_cols(bike_orderlines_joined_tbl %&gt;% select(order.id)) %&gt;%
+  
+  #Re-order:
+  
+  select(order.id, contains(&quot;order&quot;), contains(&quot;model&quot;), contains(&quot;category&quot;),
+         price, quantity, total.price,
+         everything()) %&gt;%
+  
+  #Rename columns (one at the time vs. multiple at once)
+  
+  rename(bikeshop = name) %&gt;%
+  set_names(names(.) %&gt;% str_replace_all(&quot;\\.&quot;, &quot;_&quot;))
+
+bike_orderlines_wrangled_city_separated_tbl</code></pre>
+<pre><code>## # A tibble: 15,644 x 19
+##    order_id order_line order_date          model model_year category_1
+##       &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;              &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;     
+##  1        1          1 2015-01-07 00:00:00 Spec~       2021 Mountain  
+##  2        1          2 2015-01-07 00:00:00 Ulti~       2020 Road      
+##  3        2          1 2015-01-10 00:00:00 Neur~       2021 Mountain  
+##  4        2          2 2015-01-10 00:00:00 Spee~       2019 Road      
+##  5        3          1 2015-01-10 00:00:00 Stit~       2020 Mountain  
+##  6        3          2 2015-01-10 00:00:00 Road~       2020 Hybrid / ~
+##  7        3          3 2015-01-10 00:00:00 Spee~       2020 Road      
+##  8        3          4 2015-01-10 00:00:00 Infl~       2021 Road      
+##  9        3          5 2015-01-10 00:00:00 Torq~       2020 Mountain  
+## 10        4          1 2015-01-11 00:00:00 Ulti~       2020 Road      
+## # ... with 15,634 more rows, and 13 more variables: category_2 &lt;chr&gt;,
+## #   category_3 &lt;chr&gt;, price &lt;dbl&gt;, quantity &lt;dbl&gt;, total_price &lt;dbl&gt;,
+## #   frame_material &lt;chr&gt;, weight &lt;dbl&gt;, url &lt;chr&gt;, bikeshop &lt;chr&gt;, City &lt;chr&gt;,
+## #   State &lt;chr&gt;, lat &lt;dbl&gt;, lng &lt;dbl&gt;</code></pre>
 <p><strong>Business Insights</strong></p>
-<p>Analyze the sales by location (state)</p>
-<p>library(lubridate)</p>
-<p>Step 1 - Manipulate</p>
-<p>sales_by_location_tbl &lt;- bike_orderlines_wrangled_city_separated_tbl %&gt;%</p>
-<p>Select columns</p>
-<p>select(State, City, total_price) %&gt;%</p>
-<p>Grouping by state and summarizing sales</p>
-<p>group_by(State) %&gt;% summarize(state_sales = sum(total_price)) %&gt;%</p>
-<p>Optional: Add a column that turns the numbers into a currency format (makes it in the plot optically more appealing)</p>
-<p>mutate(sales_formatted = scales::dollar(state_sales, big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €"))</p>
-<p><strong>Step 2 - Visualize</strong></p>
-<p>sales_by_location_tbl %&gt;% ggplot(aes(x = State, y = state_sales)) +</p>
-<p>Geometries</p>
-<p>geom_col(fill = “#2DC6D6”) + # Use geom_col for a bar plot geom_label(aes(label = sales_formatted)) + # Adding labels to the bars geom_smooth(method = “lm”, se = FALSE) + # Adding a trendline</p>
-<p>Formatting scale_y_continuous(labels = scales::dollar) + # Change the y-axis. Again, we have to adjust it for euro values</p>
-<p>scale_y_continuous(labels = scales::dollar_format(big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €")) + Rotate plot:</p>
-<p>theme(axis.text.x = element_text(angle = 45, hjust = 1)) +</p>
-<p>labs( title = “States revenue by year”, x = "“, # Override defaults for x and y y =”Revenue" )</p>
-<p>**Analyze the sales by location and year*</p>
-<p>Step 1 - Manipulate</p>
-<p>sales_by_state_year_tbl &lt;- bike_orderlines_wrangled_city_separated_tbl %&gt;%</p>
-<p>Select columns and add a year</p>
-<p>select(order_date, total_price, State) %&gt;% mutate(year = year(order_date)) %&gt;%</p>
-<p>Group by and summarize year and main catgegory</p>
-<p>group_by(State, year) %&gt;% summarise(sales = sum(total_price)) %&gt;% ungroup() %&gt;%</p>
-<p>Format $ Text</p>
-<p>mutate(sales_formatted = scales::dollar(sales, big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €"))</p>
-<p><strong>Step 2 - Visualize</strong></p>
-<p>sales_by_state_year_tbl %&gt;%</p>
-<p>ggplot(aes(x = year, y = sales, fill = State)) + geom_col() + # Run up to here to get a stacked bar plot facet_wrap(~ State) + scale_y_continuous(labels = scales::dollar_format(big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €“)) + labs( title =”Revenue by year and state“, subtitle =”Each State has a dynamic trend“, fill =”States" # Changes the legend name )</p>
+<pre class="r"><code>#Analyze the sales by location (state) ----
+
+library(lubridate)
+  # Step 1 - Manipulate
+  sales_by_location_tbl &lt;- bike_orderlines_wrangled_city_separated_tbl %&gt;%
+  
+  # Select columns
+  select(State, City, total_price) %&gt;%
+  
+  # Grouping by state and summarizing sales
+  group_by(State) %&gt;% 
+  summarize(state_sales = sum(total_price)) %&gt;%
+  
+  # Optional: Add a column that turns the numbers into a currency format 
+  # (makes it in the plot optically more appealing)
+  # mutate(sales_text = scales::dollar(sales)) &lt;- Works for dollar values
+  mutate(sales_formatted = scales::dollar(state_sales, big.mark = &quot;.&quot;, 
+                                     decimal.mark = &quot;,&quot;, 
+                                     prefix = &quot;&quot;, 
+                                     suffix = &quot; €&quot;))
+
+sales_by_location_tbl</code></pre>
+<pre><code>## # A tibble: 12 x 3
+##    State                         state_sales sales_formatted
+##    &lt;chr&gt;                               &lt;dbl&gt; &lt;chr&gt;          
+##  1 Baden-Württemberg                 6521090 6.521.090 €    
+##  2 Bavaria                           6742819 6.742.819 €    
+##  3 Berlin                            1128433 1.128.433 €    
+##  4 Bremen                           10653499 10.653.499 €   
+##  5 Hamburg                           3874756 3.874.756 €    
+##  6 Hesse                             1558901 1.558.901 €    
+##  7 Lower Saxony                      4107115 4.107.115 €    
+##  8 Mecklenburg-Western Pomerania      618974 618.974 €      
+##  9 North Rhine-Westphalia           21200613 21.200.613 €   
+## 10 Saxony                            2230245 2.230.245 €    
+## 11 Saxony-Anhalt                      569614 569.614 €      
+## 12 Schleswig-Holstein                3224749 3.224.749 €</code></pre>
+<pre class="r"><code># Step 2 - Visualize
+sales_by_location_tbl %&gt;%
+  
+  # Setup canvas with the columns year (x-axis) and sales (y-axis)
+  ggplot(aes(x = State, y = state_sales)) +
+  
+  # Geometries
+  geom_col(fill = &quot;#2DC6D6&quot;) + # Use geom_col for a bar plot
+  geom_label(aes(label = sales_formatted)) + # Adding labels to the bars
+  geom_smooth(method = &quot;lm&quot;, se = FALSE) + # Adding a trendline
+  
+  # Formatting
+  # scale_y_continuous(labels = scales::dollar) + # Change the y-axis. 
+  # Again, we have to adjust it for euro values
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot; €&quot;)) +
+  # Rotate plot: 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+
+  labs(
+    title    = &quot;States revenue by year&quot;,
+    x = &quot;&quot;, # Override defaults for x and y
+    y = &quot;Revenue&quot;
+  )</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>#**Step 2 - Visualize**
+
+
+  sales_by_location_tbl %&gt;%
+  ggplot(aes(x = State, y = state_sales)) +
+  
+  #Geometries
+  
+  geom_col(fill = &quot;#2DC6D6&quot;) + # Use geom_col for a bar plot
+  geom_label(aes(label = sales_formatted)) + # Adding labels to the bars
+  geom_smooth(method = &quot;lm&quot;, se = FALSE) + # Adding a trendline
+  
+  #Formatting
+  scale_y_continuous(labels = scales::dollar) + # Change the y-axis. 
+  #Again, we have to adjust it for euro values
+  
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot; €&quot;)) +
+  #Rotate plot: 
+  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+
+  labs(
+    title    = &quot;States revenue by year&quot;,
+    x = &quot;&quot;, # Override defaults for x and y
+    y = &quot;Revenue&quot;
+  )</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<p><strong>Analyze the sales by location and year</strong></p>
+<pre class="r"><code>#Step 1 - Manipulate
+sales_by_state_year_tbl &lt;- bike_orderlines_wrangled_city_separated_tbl %&gt;%
+  
+  # Select columns and add a year
+  select(order_date, total_price, State) %&gt;%
+  mutate(year = year(order_date)) %&gt;%
+  
+  # Group by and summarize year and main catgegory
+  group_by(State, year) %&gt;%
+  summarise(sales = sum(total_price)) %&gt;%
+  ungroup() %&gt;%
+  
+  # Format $ Text
+  mutate(sales_formatted = scales::dollar(sales, big.mark = &quot;.&quot;, 
+                                     decimal.mark = &quot;,&quot;, 
+                                     prefix = &quot;&quot;, 
+                                     suffix = &quot; €&quot;))</code></pre>
+<pre class="r"><code># Step 2 - Visualize
+sales_by_state_year_tbl %&gt;%
+  
+  # Set up x, y, fill
+  ggplot(aes(x = year, y = sales, fill = State)) +
+  
+  # Geometries
+  geom_col() + # Run up to here to get a stacked bar plot
+  
+  # Facet
+  facet_wrap(~ State) +
+  
+  # Formatting
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot; €&quot;)) +
+  labs(
+    title = &quot;Revenue by year and state&quot;,
+    subtitle = &quot;Each State has a dynamic trend&quot;,
+    fill = &quot;States&quot; # Changes the legend name
+  )</code></pre>
+<p><img src="journal_files/figure-html/plot-1.png" width="960" /></p>
 <p><strong>Writing Files</strong></p>
-<p>Excel:</p>
-<p>library(“writexl”)</p>
-<p>bike_orderlines_wrangled_city_separated_tbl %&gt;% write_xlsx(“00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx”)</p>
-<p>CSV:</p>
-<p>bike_orderlines_wrangled_city_separated_tbl %&gt;% write_csv(“00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv”)</p>
-<p>RDS:</p>
-<p>bike_orderlines_wrangled_city_separated_tbl %&gt;% write_rds(“00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds”)</p>
+<pre class="r"><code>#Excel:
+
+library(&quot;writexl&quot;)
+
+bike_orderlines_wrangled_city_separated_tbl %&gt;%
+  write_xlsx(&quot;00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx&quot;)
+
+#CSV:
+
+bike_orderlines_wrangled_city_separated_tbl %&gt;% 
+  write_csv(&quot;00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv&quot;)
+
+#RDS:
+
+bike_orderlines_wrangled_city_separated_tbl %&gt;% 
+  write_rds(&quot;00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds&quot;)</code></pre>
 </div>
+</div>
+<div id="challenge-3-web-scrapping" class="section level1">
+<h1><span class="header-section-number">5</span> Challenge 3 Web scrapping</h1>
+<div id="task-description" class="section level2">
+<h2><span class="header-section-number">5.1</span> Task description</h2>
+<ol style="list-style-type: decimal">
+<li><p>Get some data via an API. There are millions of providers, that offer API access for free and have good documentation about how to query their service. You just have to google them. You can use whatever service you want. For example, you can get data about your listening history (spotify), get data about flights (skyscanner) or just check the weather forecast.</p></li>
+<li><p>Scrape one of the competitor websites of canyon (either <a href="https://www.rosebikes.de/" class="uri">https://www.rosebikes.de/</a> or <a href="https://www.radon-bikes.de" class="uri">https://www.radon-bikes.de</a>) and create a small database. The database should contain the model names and prices for at least one category. Use the selectorgadget to get a good understanding of the website structure.</p></li>
+</ol>
+</div>
+<div id="solution-1" class="section level2">
+<h2><span class="header-section-number">5.2</span> Solution</h2>
+<p>#Session3_ Challenge:</p>
+<p>Notes: # 200: The request has succeeded. # 403: The client does not have access rights to the content. # 404: Not found. The server can not find the requested resource.</p>
+<p><strong>1.0 LIBRARIES</strong></p>
+<pre class="r"><code>library(tidyverse) # Main Package - Loads dplyr, purrr, etc.
+library(rvest)     # HTML Hacking &amp; Web Scraping
+library(xopen)     # Quickly opening URLs
+library(jsonlite)  # converts JSON files to R objects
+library(glue)      # concatenate strings
+library(stringi)   # character string/text processing
+library(RSQLite)
+library(httr)
+library(&quot;rstudioapi&quot;)</code></pre>
+<p><strong>Read wibsite API</strong></p>
+<pre class="r"><code>  url = &quot;https://itunes.apple.com/search?term=radiohead&quot;
+  
+  resp &lt;- GET(url)
+##########################
+#From a character vector, we can convert it into list data structure using
+#the fromJSON() function from the jsonlite library. We can use toJSON() to
+#convert something back to the original JSON structure.
+##########################
+
+respone_tbl &lt;- resp %&gt;% .$content %&gt;% rawToChar() %&gt;% fromJSON() %&gt;% as_tibble()
+
+kable(respone_tbl)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">resultCount</th>
+<th align="left">results</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="left">track</td>
+</tr>
+</tbody>
+</table>
+<p><strong>WEBSCRAPING</strong></p>
+<p># 1.0 COLLECT PRODUCT FAMILIES —-</p>
+<pre class="r"><code>url_home          &lt;- &quot;https://www.rosebikes.de&quot;</code></pre>
+<p># Read in the HTML for the entire webpage</p>
+<pre class="r"><code>html_home         &lt;- read_html(url_home)</code></pre>
+<p># Web scrape the ids for the families</p>
+<pre class="r"><code>bike_family_tbl &lt;- html_home %&gt;%
+  
+  # Get the nodes for the families ...
+  html_nodes(css = &quot;.main-navigation-category-with-tiles__item &gt; a&quot;) %&gt;%
+  # ...and extract the information of the id attribute
+  html_attr(&#39;href&#39;) %&gt;% 
+  
+  # Remove the product families Gear and Outlet and Woman 
+  # (because the female bikes are also listed with the others)
+  discard(.p = ~stringr::str_detect(.x,&quot;sale|reise|urban|kinder|cyclocross|e-bike&quot;)) %&gt;%
+  
+  # Convert vector to tibble
+  enframe( name = &quot;&quot;, value = &quot;subdirectory&quot;) %&gt;%
+  select(-&quot;&quot;) %&gt;%
+  
+  # Add the domain, because we will get only the subdirectories
+  mutate(
+    url = glue(&quot;https://www.rosebikes.de{subdirectory}&quot;)
+  ) %&gt;%
+  separate(col    = subdirectory,
+           into   = c(&quot;S&quot;,&quot;MI&quot;, &quot;category_name&quot;),
+           sep    = &quot;/&quot;)%&gt;%
+
+  select(-&quot;S&quot;,-&quot;MI&quot;)
+
+kable(bike_family_tbl)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">category_name</th>
+<th align="left">url</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mtb</td>
+<td align="left"><a href="https://www.rosebikes.de/fahrräder/mtb" class="uri">https://www.rosebikes.de/fahrräder/mtb</a></td>
+</tr>
+<tr class="even">
+<td align="left">rennrad</td>
+<td align="left"><a href="https://www.rosebikes.de/fahrräder/rennrad" class="uri">https://www.rosebikes.de/fahrräder/rennrad</a></td>
+</tr>
+<tr class="odd">
+<td align="left">gravel</td>
+<td align="left"><a href="https://www.rosebikes.de/fahrräder/gravel" class="uri">https://www.rosebikes.de/fahrräder/gravel</a></td>
+</tr>
+<tr class="even">
+<td align="left">fitness</td>
+<td align="left"><a href="https://www.rosebikes.de/fahrräder/fitness" class="uri">https://www.rosebikes.de/fahrräder/fitness</a></td>
+</tr>
+<tr class="odd">
+<td align="left">trekking</td>
+<td align="left"><a href="https://www.rosebikes.de/fahrräder/trekking" class="uri">https://www.rosebikes.de/fahrräder/trekking</a></td>
+</tr>
+</tbody>
+</table>
+<p># 2.0 COLLECT BIKE DATA</p>
+<p># 2.2 Wrap it into a function</p>
+<pre class="r"><code>get_bike_data &lt;- function(url, category) {
+
+  html_bike&lt;- read_html(url)
+  
+  bikes &lt;- html_bike %&gt;% html_nodes(css = &quot;.catalog-category-bikes__title-text&quot;)%&gt;% 
+           html_text() %&gt;% 
+           enframe(name = &quot;No.&quot;, value = &quot;Bike Name&quot;)
+  
+  bike_url  &lt;- bikes%&gt;%
+               mutate (
+              
+                Price = html_bike %&gt;% 
+                html_nodes(css = &quot;.catalog-category-bikes__price-title&quot;)%&gt;% 
+                html_text()
+              )
+    
+  for (type in bikes) {
+       bike_url &lt;- bike_url %&gt;% mutate(
+       category_name = category
+        )
+  }
+  return (bike_url)
+}</code></pre>
+<p># Extract the urls as a character vector</p>
+<pre class="r"><code>bike_category_url_vec &lt;- bike_family_tbl %&gt;% pull(url)
+bike_category_cag_vec &lt;- bike_family_tbl %&gt;% pull(category_name)
+
+bike_data_1 =  get_bike_data(bike_category_url_vec[1],bike_category_cag_vec[1])
+bike_data_2 =  get_bike_data(bike_category_url_vec[2],bike_category_cag_vec[2])
+bike_data_3 =  get_bike_data(bike_category_url_vec[3],bike_category_cag_vec[3])
+bike_data_4 =  get_bike_data(bike_category_url_vec[4],bike_category_cag_vec[4])
+
+# Merge the list into a tibble
+bike_data_tbl &lt;- bind_rows(bike_data_1,bike_data_2,bike_data_3, bike_data_4)
+saveRDS(bike_data_tbl, &quot;bike_data_tbl.rds&quot;)
+
+kable(bike_data_tbl)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">No.</th>
+<th align="left">Bike Name</th>
+<th align="left">Price</th>
+<th align="left">category_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">GROUND CONTROL</td>
+<td align="left">ab 1.699,00 €</td>
+<td align="left">mtb</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">ROOT MILLER</td>
+<td align="left">ab 1.999,00 €</td>
+<td align="left">mtb</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">PIKES PEAK</td>
+<td align="left">ab 3.099,00 €</td>
+<td align="left">mtb</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">THE BRUCE</td>
+<td align="left"></td>
+<td align="left">mtb</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">COUNT SOLO</td>
+<td align="left"></td>
+<td align="left">mtb</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">PSYCHO PATH</td>
+<td align="left">ab 1.849,00 €</td>
+<td align="left">mtb</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">THRILL HILL</td>
+<td align="left">ab 2.599,00 €</td>
+<td align="left">mtb</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">THRILL HILL TRAIL</td>
+<td align="left">ab 2.899,00 €</td>
+<td align="left">mtb</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">SOUL FIRE</td>
+<td align="left">ab 2.149,00 €</td>
+<td align="left">mtb</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">PRO SL DISC</td>
+<td align="left">ab 1.599,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="left">PRO SL</td>
+<td align="left">ab 1.199,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="left">REVEAL FOUR DISC</td>
+<td align="left">ab 2.499,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">REVEAL FOUR</td>
+<td align="left">ab 2.099,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="left">REVEAL SIX DISC</td>
+<td align="left">ab 3.499,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">X-LITE FOUR DISC</td>
+<td align="left">ab 2.699,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="even">
+<td align="right">7</td>
+<td align="left">X-LITE FOUR</td>
+<td align="left">ab 2.199,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">X-LITE SIX DISC</td>
+<td align="left">ab 3.899,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="left">X-LITE SIX</td>
+<td align="left">ab 3.499,00 €</td>
+<td align="left">rennrad</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">BACKROAD AL</td>
+<td align="left">ab 1.549,00 €</td>
+<td align="left">gravel</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">BACKROAD</td>
+<td align="left">ab 2.599,00 €</td>
+<td align="left">gravel</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">BACKROAD LIMITED</td>
+<td align="left">ab 4.599,00 €</td>
+<td align="left">gravel</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">MULTISTREET FITNESS</td>
+<td align="left">ab 1.299,00 €</td>
+<td align="left">fitness</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="left">MULTISPORT FITNESS</td>
+<td align="left">ab 1.099,00 €</td>
+<td align="left">fitness</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="left">MULTICROSS</td>
+<td align="left">ab 2.149,00 €</td>
+<td align="left">fitness</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="session-4-challenge-data-wrangling" class="section level1">
+<h1><span class="header-section-number">6</span> Session 4 challenge: Data wrangling</h1>
+<div id="task-description-1" class="section level2">
+<h2><span class="header-section-number">6.1</span> Task description:</h2>
+<ol style="list-style-type: decimal">
+<li><p>Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.</p></li>
+<li><p>Recent patent acitivity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.</p></li>
+<li><p>Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?</p></li>
+</ol>
+</div>
+<div id="solution-2" class="section level2">
+<h2><span class="header-section-number">6.2</span> Solution:</h2>
+<p><strong>Patents analysis</strong> # Importing data:</p>
+<pre class="r"><code>library(vroom)
+# Tidyverse
+library(tidyverse)
+
+# Data Table
+library(data.table)
+
+# Counter
+library(tictoc)</code></pre>
+<p><strong>Patents DATA IMPORT</strong></p>
+<pre class="r"><code># Patents data preparation:
+
+col_types &lt;- list(
+  id = col_character(),
+  date = col_date(&quot;%Y-%m-%d&quot;),
+  num_claims = col_double()
+)
+
+patent_tbl &lt;- vroom(
+  file       = &quot;patent.tsv&quot;, 
+  delim      = &quot;\t&quot;, 
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+# Assignee data preparation:
+
+col_types_assignee &lt;- list(
+  id = col_character(),
+  type = col_character(),
+  organization = col_character()
+)
+
+assignee_tbl &lt;- vroom(
+  file       = &quot;assignee.tsv&quot;, 
+  delim      = &quot;\t&quot;, 
+  col_types  = col_types_assignee,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+
+# Patent-Assignee data preparation:
+
+col_types_patent_assignee &lt;- list(
+  patent_id = col_character(),
+  assignee_id = col_character()
+)
+
+
+patent_assignee_tbl &lt;- vroom(
+  file       = &quot;patent_assignee.tsv&quot;, 
+  delim      = &quot;\t&quot;, 
+  col_types  = col_types_patent_assignee,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+col_types_uspc &lt;- list(
+  patent_id = col_character(),
+  mainclass_id = col_number(),
+  sequence = col_number()
+)
+
+# USPC data preparation:
+
+uspc_tbl &lt;- vroom(
+  file       = &quot;uspc.tsv&quot;, 
+  delim      = &quot;\t&quot;, 
+  col_types  = col_types_uspc,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)</code></pre>
+<p><strong>Acquisition Data</strong></p>
+<pre class="r"><code>setDT(assignee_tbl)
+setDT(patent_tbl)
+setDT(patent_assignee_tbl)
+setDT(uspc_tbl)
+
+patent_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 327,014
+## Columns: 3
+## $ id         &lt;chr&gt; &quot;8621662&quot;, &quot;8621663&quot;, &quot;8621664&quot;, &quot;8621665&quot;, &quot;8621666&quot;, &quot;...
+## $ date       &lt;date&gt; 2014-01-07, 2014-01-07, 2014-01-07, 2014-01-07, 2014-01...
+## $ num_claims &lt;dbl&gt; 11, 6, 10, 18, 7, 9, 21, 19, 8, 18, 7, 15, 15, 15, 18, 7...</code></pre>
+<pre class="r"><code>assignee_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 47,011
+## Columns: 3
+## $ id           &lt;chr&gt; &quot;org_004j997jM9yEdS7z4ReD&quot;, &quot;org_005hVGA5JMOZsS0xOhGa&quot;...
+## $ type         &lt;chr&gt; &quot;3&quot;, &quot;3&quot;, &quot;2&quot;, &quot;2&quot;, &quot;3&quot;, &quot;3&quot;, &quot;2&quot;, &quot;3&quot;, &quot;2&quot;, &quot;3&quot;, &quot;2&quot;,...
+## $ organization &lt;chr&gt; &quot;University of Basel&quot;, &quot;Zetkama Spólka Akcyjna&quot;, &quot;Mira...</code></pre>
+<pre class="r"><code>patent_assignee_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 315,910
+## Columns: 2
+## $ patent_id   &lt;chr&gt; &quot;8709412&quot;, &quot;8636251&quot;, &quot;8899346&quot;, &quot;8700141&quot;, &quot;8724986&quot;, ...
+## $ assignee_id &lt;chr&gt; &quot;org_MPhnVOTFsXybN0auC647&quot;, &quot;org_v7VisXnmZZEEUMeHhW6y&quot;,...</code></pre>
+<pre class="r"><code>uspc_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 815,743
+## Columns: 3
+## $ patent_id    &lt;chr&gt; &quot;8829273&quot;, &quot;8623780&quot;, &quot;8904894&quot;, &quot;8794165&quot;, &quot;8773920&quot;,...
+## $ mainclass_id &lt;dbl&gt; 435, 502, 368, 111, 365, 128, 709, 707, 455, 424, 502,...
+## $ sequence     &lt;dbl&gt; 7, 2, 0, 1, 0, 4, 2, 1, 2, 2, 10, 1, 2, 4, 1, 1, 9, 0,...</code></pre>
+<p><strong>DATA WRANGLING</strong></p>
+<p># Start the analysis:</p>
+<p><strong>Task1</strong></p>
+<pre class="r"><code>#########################################################################
+# Q1.Patent Dominance: What US company / corporation has the most patents? 
+# List the 10 US companies with the most assigned/granted patents.
+## Output: 
+#########################################################################
+
+#summarize and count:
+
+setnames(assignee_tbl, &quot;id&quot;, &quot;assignee_id&quot;)
+
+combined_data &lt;- merge(x = patent_assignee_tbl, y = assignee_tbl, by = &quot;assignee_id&quot;)
+
+
+us_patents &lt;- combined_data %&gt;%
+  filter(type == 2)%&gt;%
+  filter(!is.na(patent_id) || !is.na(organization)) %&gt;%
+  select(-type, -assignee_id)%&gt;% 
+  group_by(organization) %&gt;%
+  count(patent_id) %&gt;%
+  select(-patent_id)%&gt;%
+  summarise(total = sum(n))%&gt;%
+  arrange(desc(total))   
+
+us_top_10 &lt;- us_patents %&gt;% slice(1:10)
+
+kable(us_top_10)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">organization</th>
+<th align="right">total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">International Business Machines Corporation</td>
+<td align="right">7547</td>
+</tr>
+<tr class="even">
+<td align="left">Microsoft Corporation</td>
+<td align="right">3165</td>
+</tr>
+<tr class="odd">
+<td align="left">Google Inc.</td>
+<td align="right">2668</td>
+</tr>
+<tr class="even">
+<td align="left">QUALCOMM Incorporated</td>
+<td align="right">2597</td>
+</tr>
+<tr class="odd">
+<td align="left">Apple Inc.</td>
+<td align="right">2201</td>
+</tr>
+<tr class="even">
+<td align="left">General Electric Company</td>
+<td align="right">1873</td>
+</tr>
+<tr class="odd">
+<td align="left">Hewlett-Packard Development Company, L.P.</td>
+<td align="right">1638</td>
+</tr>
+<tr class="even">
+<td align="left">AT&amp;T INTELLECTUAL PROPERTY I, L.P.</td>
+<td align="right">1625</td>
+</tr>
+<tr class="odd">
+<td align="left">Intel Corporation</td>
+<td align="right">1616</td>
+</tr>
+<tr class="even">
+<td align="left">GM Global Technology Operations LLC</td>
+<td align="right">1533</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Task2</strong></p>
+<pre class="r"><code>#########################################################################
+# Q2. Recent patent acitivity: What US company had the most patents granted in 2014? 
+#List the top 10 companies with the most new granted patents for 2019.
+#########################################################################
+
+
+tbl_2 &lt;- patent_tbl %&gt;%   
+         separate(col  = date,
+         into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;),
+          sep  = &quot;-&quot;, remove = TRUE) %&gt;%
+          mutate(
+              month = as.numeric(month)
+            )%&gt;%
+          filter(month == 01)%&gt;%
+          select(-year, -day)
+
+setnames(tbl_2, &quot;id&quot;, &quot;patent_id&quot;)
+combined_data_2 &lt;- merge(x = tbl_2, y = combined_data, by = &quot;patent_id&quot;)
+
+us_top10_2014_01 &lt;- combined_data_2%&gt;%
+                    filter(type == 2)%&gt;%
+                    filter(!is.na(patent_id) || !is.na(organization)) %&gt;%
+                    select(organization, patent_id) %&gt;%
+                    group_by(organization) %&gt;%
+                    count(patent_id) %&gt;%   
+                    summarise(total_patents = sum(n))%&gt;%
+                    arrange(desc(total_patents)) %&gt;% slice(1:10)  
+
+us_top10_2014_01_new &lt;- combined_data_2%&gt;%
+                        filter(type == 2 &amp; num_claims == 1)%&gt;%
+                        filter(!is.na(patent_id) || !is.na(organization)) %&gt;%
+                        select(organization, patent_id) %&gt;%
+                        group_by(organization) %&gt;%
+                        count(patent_id) %&gt;%   
+                        summarise(total_patents = sum(n))%&gt;%
+                        arrange(desc(total_patents)) %&gt;% slice(1:10)
+
+kable(us_top10_2014_01, caption = &quot;US to 10 compnies with granted patents&quot;)</code></pre>
+<table>
+<caption>US to 10 compnies with granted patents</caption>
+<thead>
+<tr class="header">
+<th align="left">organization</th>
+<th align="right">total_patents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">International Business Machines Corporation</td>
+<td align="right">628</td>
+</tr>
+<tr class="even">
+<td align="left">Microsoft Corporation</td>
+<td align="right">220</td>
+</tr>
+<tr class="odd">
+<td align="left">QUALCOMM Incorporated</td>
+<td align="right">201</td>
+</tr>
+<tr class="even">
+<td align="left">Google Inc.</td>
+<td align="right">144</td>
+</tr>
+<tr class="odd">
+<td align="left">Apple Inc.</td>
+<td align="right">133</td>
+</tr>
+<tr class="even">
+<td align="left">GM Global Technology Operations LLC</td>
+<td align="right">129</td>
+</tr>
+<tr class="odd">
+<td align="left">AT&amp;T INTELLECTUAL PROPERTY I, L.P.</td>
+<td align="right">123</td>
+</tr>
+<tr class="even">
+<td align="left">Intel Corporation</td>
+<td align="right">105</td>
+</tr>
+<tr class="odd">
+<td align="left">General Electric Company</td>
+<td align="right">96</td>
+</tr>
+<tr class="even">
+<td align="left">Cisco Technology, Inc.</td>
+<td align="right">94</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>kable(us_top10_2014_01_new, caption =  &quot;US top 10 compnies with New granted patents&quot;)</code></pre>
+<table>
+<caption>US top 10 compnies with New granted patents</caption>
+<thead>
+<tr class="header">
+<th align="left">organization</th>
+<th align="right">total_patents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">NIKE, Inc.</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">Spectrum Diversified Designs, Inc.</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">Bumble BE Holdings, LLC</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">KM Fashion Eyewear, LLC</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">KOHLER CO.</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">Steelcase Inc.</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">3M Innovative Properties Company</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">OSRAM SYLVANIA Inc.</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">Apple Inc.</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">Masco Corporation of Indiana</td>
+<td align="right">9</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Task3</strong></p>
+<pre class="r"><code> #########################################################################
+# Q. Innovation in Tech: What is the most innovative tech sector? 
+# What is the most innovative tech sector? For the top 10 companies (worldwide)
+# with the most patents, what are the top 5 USPTO tech main classes?
+#########################################################################
+
+combined_data_3 &lt;- merge(x = uspc_tbl, y = combined_data_2, by = &quot;patent_id&quot;)
+
+
+
+top10_worlwide_patents &lt;- combined_data_3  %&gt;%
+                  filter(!is.na(patent_id) || !is.na(organization))%&gt;%
+                  group_by(organization) %&gt;%
+                  arrange(desc(mainclass_id)) %&gt;% # set mainclass order first, the result will be sorted automatically 
+                  count(patent_id) %&gt;%
+                  select(-patent_id)%&gt;%
+                  summarise(total_patents_wordwide = sum(n))%&gt;%
+                  ungroup() %&gt;%
+                  arrange(desc(total_patents_wordwide)) %&gt;% slice(1:10)  
+
+top10_worlwid_top5_upts &lt;- top10_worlwide_patents %&gt;% slice(1:5)  
+
+kable(top10_worlwide_patents, caption = &quot;Top 10 granted patents compnies WORLD WIDE&quot;)</code></pre>
+<table>
+<caption>Top 10 granted patents compnies WORLD WIDE</caption>
+<thead>
+<tr class="header">
+<th align="left">organization</th>
+<th align="right">total_patents_wordwide</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">International Business Machines Corporation</td>
+<td align="right">1553</td>
+</tr>
+<tr class="even">
+<td align="left">Samsung Electronics Co., Ltd.</td>
+<td align="right">983</td>
+</tr>
+<tr class="odd">
+<td align="left">Canon Kabushiki Kaisha</td>
+<td align="right">753</td>
+</tr>
+<tr class="even">
+<td align="left">Microsoft Corporation</td>
+<td align="right">640</td>
+</tr>
+<tr class="odd">
+<td align="left">Sony Corporation</td>
+<td align="right">640</td>
+</tr>
+<tr class="even">
+<td align="left">QUALCOMM Incorporated</td>
+<td align="right">618</td>
+</tr>
+<tr class="odd">
+<td align="left">Hon Hai Precision Industry Co., Ltd.</td>
+<td align="right">586</td>
+</tr>
+<tr class="even">
+<td align="left">AT&amp;T INTELLECTUAL PROPERTY I, L.P.</td>
+<td align="right">434</td>
+</tr>
+<tr class="odd">
+<td align="left">Samsung Display Co., Ltd.</td>
+<td align="right">421</td>
+</tr>
+<tr class="even">
+<td align="left">LG Electronics Inc.</td>
+<td align="right">411</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>kable(top10_worlwid_top5_upts, caption = &quot;Top 5 compnies acquiring UPTS among the TOP 10&quot;)</code></pre>
+<table>
+<caption>Top 5 compnies acquiring UPTS among the TOP 10</caption>
+<thead>
+<tr class="header">
+<th align="left">organization</th>
+<th align="right">total_patents_wordwide</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">International Business Machines Corporation</td>
+<td align="right">1553</td>
+</tr>
+<tr class="even">
+<td align="left">Samsung Electronics Co., Ltd.</td>
+<td align="right">983</td>
+</tr>
+<tr class="odd">
+<td align="left">Canon Kabushiki Kaisha</td>
+<td align="right">753</td>
+</tr>
+<tr class="even">
+<td align="left">Microsoft Corporation</td>
+<td align="right">640</td>
+</tr>
+<tr class="odd">
+<td align="left">Sony Corporation</td>
+<td align="right">640</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
