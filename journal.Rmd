@@ -48,10 +48,9 @@ bikeshops_tbl  <- read_excel("00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
 
 ```{r}
 
-left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
+kable(left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id")))
 
 ```
-
 
 Chaining commands with the pipe and assigning it to order_items_joined_tbl
 
@@ -61,7 +60,7 @@ bike_orderlines_joined_tbl <- orderlines_tbl %>%
   left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%
   left_join(bikeshops_tbl, by = c("customer.id" = "bikeshop.id"))
 
-bike_orderlines_joined_tbl
+kable(bike_orderlines_joined_tbl)
 ```
 
 **Re-format:**
@@ -122,9 +121,8 @@ bike_orderlines_wrangled_city_separated_tbl <- bike_orderlines_joined_tbl %>%
   rename(bikeshop = name) %>%
   set_names(names(.) %>% str_replace_all("\\.", "_"))
 
-bike_orderlines_wrangled_city_separated_tbl
+kable(bike_orderlines_wrangled_city_separated_tbl, caption = "Bikes order lines separated by CITY")
 ```
-
   
 **Business Insights**
 
@@ -261,31 +259,8 @@ sales_by_state_year_tbl %>%
 
 ```
 
-**Writing Files**
 
-```{r}
-
-#Excel:
-
-library("writexl")
-
-bike_orderlines_wrangled_city_separated_tbl %>%
-  write_xlsx("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx")
-
-#CSV:
-
-bike_orderlines_wrangled_city_separated_tbl %>% 
-  write_csv("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv")
-
-#RDS:
-
-bike_orderlines_wrangled_city_separated_tbl %>% 
-  write_rds("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds")
-
-```
-
-
-# Challenge 3 Web scrapping 
+# Challenge_3 Web scrapping 
 
 ## Task description
 
@@ -297,8 +272,6 @@ bike_orderlines_wrangled_city_separated_tbl %>%
 
 \#Session3_ Challenge:
 
-
-
 Notes:
  \# 200: The request has succeeded.
  \# 403: The client does not have access rights to the content.
@@ -306,6 +279,7 @@ Notes:
 
 
 **1.0 LIBRARIES**
+
 ```{r}
 library(tidyverse) # Main Package - Loads dplyr, purrr, etc.
 library(rvest)     # HTML Hacking & Web Scraping
@@ -346,11 +320,13 @@ url_home          <- "https://www.rosebikes.de"
 ```
 
 \# Read in the HTML for the entire webpage
+
 ```{r}
 html_home         <- read_html(url_home)
 ```
 
 \# Web scrape the ids for the families
+
 ```{r}
 bike_family_tbl <- html_home %>%
   
@@ -377,7 +353,7 @@ bike_family_tbl <- html_home %>%
 
   select(-"S",-"MI")
 
-kable(bike_family_tbl)
+kable(bike_family_tbl, caption = "Different bikes families URL")
 
 ```
 
@@ -410,10 +386,8 @@ get_bike_data <- function(url, category) {
   return (bike_url)
 }
 ```
-\# Extract the urls as a character vector
-```{r}
 
-```
+\# Extract the urls as a character vector
 
 ```{r}
 
@@ -432,7 +406,7 @@ saveRDS(bike_data_tbl, "bike_data_tbl.rds")
 kable(bike_data_tbl)
 ```
 
-# Session 4 challenge: Data wrangling
+# Session_4 challenge: Data wrangling
 
 ## Task description:
 
@@ -445,7 +419,9 @@ kable(bike_data_tbl)
 ## Solution:
 
 **Patents analysis** 
+
 \# Importing data: 
+
 ```{r}
 library(vroom)
 # Tidyverse
@@ -526,15 +502,16 @@ uspc_tbl <- vroom(
 **Acquisition Data**
 
 ```{r}
+
 setDT(assignee_tbl)
 setDT(patent_tbl)
 setDT(patent_assignee_tbl)
 setDT(uspc_tbl)
 
-patent_tbl %>% glimpse()
-assignee_tbl %>% glimpse()
-patent_assignee_tbl %>% glimpse()
-uspc_tbl %>% glimpse()
+kable(patent_tbl %>% glimpse())
+kable(assignee_tbl %>% glimpse())
+kable(patent_assignee_tbl %>% glimpse())
+kable(uspc_tbl %>% glimpse())
 
 ```
 
@@ -574,6 +551,7 @@ kable(us_top_10)
 ```
 
 **Task2**
+
 ```{r}
 #########################################################################
 # Q2. Recent patent acitivity: What US company had the most patents granted in 2014? 
@@ -616,8 +594,8 @@ kable(us_top10_2014_01, caption = "US to 10 compnies with granted patents")
 kable(us_top10_2014_01_new, caption =  "US top 10 compnies with New granted patents")
 ```
 
-
 **Task3**
+
 ```{r}
  #########################################################################
 # Q. Innovation in Tech: What is the most innovative tech sector? 
@@ -645,11 +623,146 @@ kable(top10_worlwide_patents, caption = "Top 10 granted patents compnies WORLD W
 kable(top10_worlwid_top5_upts, caption = "Top 5 compnies acquiring UPTS among the TOP 10")
 ```
 
+# Session_5 Data visualization:
+
+## Task description
+
+Challenge 1
+Goal: Map the time course of the cumulative Covid-19 cases!
+
+Challenge 2
+Goal: Visualize the distribution of the mortality rate (deaths / population)
 
 
+## Solustion
 
+```{r}
+#Import required Libraries
 
+library(scales)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(readxl)
+library(ggthemes)
+library(dplyr)
+library(maps)
+```
 
+**Task 1** 
+
+```{r}
+
+covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
+
+#Table for Challenge 1 before plot
+
+  covid_data_select_tbl<- covid_data_tbl %>%
+  select(countriesAndTerritories,cases,dateRep,month,year,day)%>%
+  relocate(year,month,day)%>%
+  filter(year==2020,month>1) %>%
+  filter(day!=1)%>%
+  filter(countriesAndTerritories=="France"|countriesAndTerritories=="Germany"|countriesAndTerritories=="United_Kingdom"|countriesAndTerritories=="Spain"|countriesAndTerritories=="United_States_of_America")%>%
+  group_by(countriesAndTerritories,month)%>%
+  summarize(totalcases = sum(cases)) %>%
+  ungroup()
+    
+kable(covid_data_select_tbl, caption = "Filtered data")  
+
+```
+
+**Prepared Plots**
+
+```{r}
+#Prepare plot
+  covid_data_select_tbl%>%
+  ggplot(aes(month ,totalcases, color = countriesAndTerritories)) +
+        geom_smooth(method = "loess", span = 0.2)+
+        scale_y_continuous(labels = scales::dollar_format(scale  = 1/1e6, 
+                                                        prefix = "", 
+                                                        suffix = "M")) +
+        scale_x_continuous(breaks = seq(2, 11 , by=1),labels= c("February","March","April","May","June","July","August","September","October","November")) +
+ # scale_x_continuous(labels = scales::dollar_format(scale = 1/1e6,
+                                                     #prefix= "",
+                                                    # suffix= "February")) +
+   
+labs(
+  title = ("Covid-19 confirmed cases worldwide"),
+  subtitle = ("United States has the highest rate of cases"),
+  caption = "",
+  x = "(Year 2020)",
+  y = "Cumulative Cases",
+  color = "Country"
+
+          )+
+    geom_label(aes(label = (totalcases)), 
+              hjust = "inward",
+              size  = 3,
+              color = RColorBrewer::brewer.pal(n = 11, name = "RdBu")[11]) 
+    
+```
+
+**Task 2**
+
+\#World data table:
+
+```{r}
+#importing data
+
+covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
+
+world <- map_data("world")%>%mutate(across(region, str_replace_all, "_", " ")) %>%
+  mutate(region = case_when(
+    
+    region == "UK"~ "United_Kingdom",
+    region == "USA"~"United_States_of_America" ,
+    region == "Czech_Republic"~"Czechia",
+    TRUE ~ region
+    
+  ))
+covid_data_tbl%>%mutate(across(countriesAndTerritories, str_replace_all, "_", " ")) %>%
+  mutate(countriesAndTerritories = case_when(
+    
+    countriesAndTerritories == "United Kingdom" ~ "United_Kingdom",
+    countriesAndTerritories == "United_States_of_America" ~ "United States of America",
+    countriesAndTerritories == "Czechia"~"Czechia",
+    TRUE ~ countriesAndTerritories
+    
+  ))
+
+#manipulation of world data table
+world_map<-world%>%select(region,long,lat,group)%>%rename(countriesAndTerritories=region)
+
+```
+
+\#Covid data:
+
+```{r}
+#manipulation of covid data table
+covid_modified_data_tbl<- covid_data_tbl%>%select(day,month,year,countriesAndTerritories,deaths,popData2019)%>%
+  group_by(year,countriesAndTerritories,popData2019)%>%
+  summarise(total_death=sum(deaths))%>%
+  ungroup()%>%
+  mutate(mortality_rate=(total_death/popData2019)*100)
+
+#merging data between 2 tables 
+All_data_tbl<-left_join(covid_modified_data_tbl,world_map,by="countriesAndTerritories")%>%filter(year==2020)
+```
+
+**Prepared Plots**
+
+```{r}
+
+#first layer of the map
+world_map <- map_data("world")
+ggplot(world_map, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill="lightgray", colour = "black",size=0.1)
+
+#second layer of the map
+ggplot(data=All_data_tbl, aes(x=long, y=lat, group = group))+
+  geom_polygon(aes(fill = mortality_rate), color = "red",size=0.1)+
+  scale_fill_viridis_c(option = "C", alpha = 0.75 )
+```
 
 
 
